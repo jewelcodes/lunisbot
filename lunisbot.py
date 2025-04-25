@@ -7,7 +7,9 @@ random.seed(time.time())
 DISCORD_API_TOKEN = os.getenv("DISCORD_API_TOKEN")
 DISCORD_MESSAGE_LIMIT = 2000    # discord message limit
 LUNIS_CONTEXT_LIMIT = 500       # messages to keep in memory
-RESPONSE_RATE = 0.7             # chance of responding to a relevant message
+ACTIVITY_THRESHOLD = 120        # time elapsed since last bot response
+RESPONSE_RATE = 0.65            # chance of responding to a relevant message
+ACTIVE_RESPONSE_RATE = 0.95     # chance of responding to an ongoing conversation
 LUNIS_MODEL = "llama3.2"        # model to use for responses
 
 KEYWORDS = ["linux", "linus", "torvalds", "lunis", "kernel", "git", "os",
@@ -26,6 +28,8 @@ with open("system/linus-persona.txt", "r") as f:
 context = [
     {"role": "system", "content": persona}
 ]
+
+last_activity = time.time()
 
 def sanity_truncate(text: str) -> str:
     if len(text) > DISCORD_MESSAGE_LIMIT:
@@ -51,7 +55,7 @@ async def on_message(message: discord.Message) -> None:
     else:
         user = message.author.name
 
-    global context
+    global context, last_activity
     context.append({
         "role": "user",
         "content": f"{user}: {sanity_truncate(message.content)}"
@@ -61,9 +65,15 @@ async def on_message(message: discord.Message) -> None:
         context = context[-LUNIS_CONTEXT_LIMIT:]
         context[0] = {"role": "system", "content": persona}
 
-    if is_relevant(message.content) or lunisbot.user.mentioned_in(message):
-        if lunisbot.user.mentioned_in(message):
-            responding = True
+    relevant = is_relevant(message.content)
+    mentioned = lunisbot.user.mentioned_in(message)
+    active = (time.time() - last_activity) < ACTIVITY_THRESHOLD
+
+    if relevant or mentioned or active:
+        if mentioned:
+            responding = True   # unconditionally respond to mentions
+        elif active:
+            responding = random.random() < ACTIVE_RESPONSE_RATE
         else:
             responding = random.random() < RESPONSE_RATE
 
@@ -88,6 +98,8 @@ async def on_message(message: discord.Message) -> None:
                         "role": "assistant",
                         "content": f"LunisBot: {sanity_truncate(response)}"
                     })
+
+                    last_activity = time.time()
                     await message.channel.send(sanity_truncate(response))
             except Exception as e:
                 print(f"Exception while responding: {e}")
