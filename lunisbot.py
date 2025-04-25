@@ -89,6 +89,10 @@ async def on_message(message: discord.Message) -> None:
                 if len(response):
                     if response.lower().startswith("lunisbot:"):
                         response = response[9:]
+                    elif response.lower().startswith("lunis:"):
+                        response = response[6:]
+                    elif response.lower().startswith("bot:"):
+                        response = response[4:]
                     elif response.lower().startswith("model:"):
                         response = response[6:]
                     elif response.lower().startswith("assistant:"):
