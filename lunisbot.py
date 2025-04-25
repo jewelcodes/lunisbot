@@ -43,11 +43,18 @@ async def on_ready() -> None:
 async def on_message(message: discord.Message) -> None:
     if message.author == lunisbot.user:
         return
+    
+    if message.author.global_name:
+        user = message.author.global_name
+    elif message.author.display_name:
+        user = message.author.display_name
+    else:
+        user = message.author.name
 
     global GLOBAL_CONTEXT
     GLOBAL_CONTEXT.append({
         "role": "user",
-        "content": f"{message.author}: {sanity_truncate(message.content)}"
+        "content": f"{user}: {sanity_truncate(message.content)}"
     })
 
     if len(GLOBAL_CONTEXT) >= LUNIS_CONTEXT_LIMIT:
