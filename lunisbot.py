@@ -23,7 +23,7 @@ lunisbot = discord.Client(intents=intents)
 with open("system/linus-persona.txt", "r") as f:
     persona = f.read()
 
-GLOBAL_CONTEXT = [
+context = [
     {"role": "system", "content": persona}
 ]
 
@@ -51,15 +51,15 @@ async def on_message(message: discord.Message) -> None:
     else:
         user = message.author.name
 
-    global GLOBAL_CONTEXT
-    GLOBAL_CONTEXT.append({
+    global context
+    context.append({
         "role": "user",
         "content": f"{user}: {sanity_truncate(message.content)}"
     })
 
-    if len(GLOBAL_CONTEXT) >= LUNIS_CONTEXT_LIMIT:
-        GLOBAL_CONTEXT = GLOBAL_CONTEXT[-LUNIS_CONTEXT_LIMIT:]
-        GLOBAL_CONTEXT[0] = {"role": "system", "content": persona}
+    if len(context) >= LUNIS_CONTEXT_LIMIT:
+        context = context[-LUNIS_CONTEXT_LIMIT:]
+        context[0] = {"role": "system", "content": persona}
 
     if is_relevant(message.content) or lunisbot.user.mentioned_in(message):
         if lunisbot.user.mentioned_in(message):
@@ -69,7 +69,7 @@ async def on_message(message: discord.Message) -> None:
 
         if responding:
             try:
-                response = ollama.chat(LUNIS_MODEL, messages=GLOBAL_CONTEXT)
+                response = ollama.chat(LUNIS_MODEL, messages=context)
                 if response:
                     response = response.get("message", {}).get("content", "")
                     response.strip()
@@ -84,7 +84,7 @@ async def on_message(message: discord.Message) -> None:
                     elif response.lower().startswith("assistant:"):
                         response = response[10:]
 
-                    GLOBAL_CONTEXT.append({
+                    context.append({
                         "role": "assistant",
                         "content": f"LunisBot: {sanity_truncate(response)}"
                     })
