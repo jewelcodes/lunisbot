@@ -8,6 +8,7 @@ DISCORD_API_TOKEN = os.getenv("DISCORD_API_TOKEN")
 DISCORD_MESSAGE_LIMIT = 2000    # discord message limit
 LUNIS_CONTEXT_LIMIT = 500       # messages to keep in memory
 RESPONSE_RATE = 0.7             # chance of responding to a relevant message
+LUNIS_MODEL = "llama3.2"        # model to use for responses
 
 KEYWORDS = ["linux", "linus", "torvalds", "lunis", "kernel", "git", "os",
             "windows", "java", "open-source", "open source"]
@@ -61,7 +62,7 @@ async def on_message(message: discord.Message) -> None:
 
         if responding:
             try:
-                response = ollama.chat("llama3.2", messages=GLOBAL_CONTEXT)
+                response = ollama.chat(LUNIS_MODEL, messages=GLOBAL_CONTEXT)
                 if response:
                     response = response.get("message", {}).get("content", "")
                     response.strip()
