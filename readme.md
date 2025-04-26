@@ -19,7 +19,7 @@ Because sometimes you need to build something that serves no real purpose just t
 
 ## 🛠️ Deployment
 
-You will need to install Python, the `ollama` client, and local `llama-3.2` weights. You will also need a Discord API key. The minimal Discord permissions required by the bot are *send messages* and *read message history*. You can optionally also allow *sending messages in threads*.
+You will need to install Python, the `ollama` client, and local `llama-3.2` weights. You will also need a Discord API key. The minimal Discord permissions required by the bot are **send messages** and **read message history**. You can optionally also allow **sending messages in threads**.
 
 After you do that, start by cloning the repo:
 
@@ -43,7 +43,7 @@ python3 lunisbot.py
 
 ## 🫶🏼 Credits
 * Linus Torvalds for being the absolute genius he is
-* The troll who was arguing with a bot and giving me this idea
+* The troll who was arguing with a bot for giving me this idea
 * [@Dcraftbg](https://github.com/Dcraftbg) for coming up with the name LunisBot
 * Me, for wasting a perfectly sunny day staying in to build this
 
